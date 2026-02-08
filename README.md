@@ -2,150 +2,94 @@
 
 ## Index
 
-1. Overview
-2. Dataset
-3. Target Variable
-4. Feature Engineering
-5. Model Selection
-6. Model Training
-7. Model Evaluation
-8. Cross-Validation
-9. Model Saving
-10. Test Dataset Prediction
-11. Tools & Libraries
-12. Conclusion
+1. Overview & Dataset
+2. Feature Engineering
+3. Model Selection & Training
+4. Model Evaluation & Cross-Validation
+5. Test Prediction & Submission
+6. Conclusion
 
 ---
 
-## 1. Overview
+## 1. Overview & Dataset
 
-This project performs **binary classification** to detect network intrusions.
-Each network packet is classified as either:
+This project performs **binary classification** to detect network intrusions in packet-level data.
 
-* `0` → Normal traffic
-* `1` → Intrusion
+* **Training file:** `network_train.csv`
+* **Test file:** `network_test.csv`
+* **Target:** `Intrusion_Detected`
 
-Logistic Regression is used, and performance is evaluated mainly using the **AUC metric**.
+  * `0` → Normal
+  * `1` → Intrusion
+* **Dropped column:** `Packet_ID` (used only for submission)
 
----
-
-## 2. Dataset
-
-The dataset contains two files:
-
-* `network_train.csv` – Training data with features and labels
-* `network_test.csv` – Test data without labels
+The model is evaluated using **AUC**, as required by Kaggle.
 
 ---
 
-## 3. Target Variable
+## 2. Feature Engineering
 
-**Intrusion_Detected**
+The following preprocessing steps were applied:
 
-* `0` → Normal packet
-* `1` → Intrusion detected
-
----
-
-## 4. Feature Engineering
-
-The following steps were applied:
-
-1. Dropped `Packet_ID`
-2. Split data into features (`X`) and target (`y`)
-3. Handled missing values using **median imputation**
-4. Standardised numerical features using **StandardScaler**
+* Removed non-informative identifier (`Packet_ID`)
+* Split data into features (`X`) and target (`y`)
+* Missing values handled using **median imputation**
+* Feature scaling using **StandardScaler**
 
 ---
 
-## 5. Model Selection
+## 3. Model Selection & Training
 
-**Model Used:** Logistic Regression
+**Model used:** Logistic Regression
 
-**Reasons for selection:**
+**Reasons:**
 
 * Suitable for binary classification
-* Produces probability outputs (required for AUC)
-* Handles large and imbalanced datasets well
-* Computationally efficient and interpretable
+* Outputs probabilities for AUC computation
+* Handles imbalanced data efficiently
 
-**Model Parameters:**
+**Configuration:**
 
 * `class_weight = 'balanced'`
 * `penalty = 'l2'`
 * `max_iter = 1000`
 
----
+**Training setup:**
 
-## 6. Model Training
-
-* Data split into **80% training** and **20% testing**
-* **Stratified split** used to maintain class balance
-* Model trained on scaled training data
+* 80–20 stratified train-test split
+* Model trained on scaled data
 
 ---
 
-## 7. Model Evaluation
+## 4. Model Evaluation & Cross-Validation
 
-The following evaluation techniques were used:
+The model was evaluated using:
 
 * Accuracy
 * Confusion Matrix
-* Precision, Recall, F1-Score
-* ROC-AUC Score
+* Precision, Recall, F1-score
+* ROC-AUC score
 * ROC Curve
+* **5-Fold Stratified Cross-Validation (AUC metric)**
 
-**Observed Performance:**
+**Results:**
 
 * Test AUC ≈ **0.97**
+* Mean CV AUC ≈ **0.98**
+
+AUC was chosen due to class imbalance and Kaggle evaluation criteria.
 
 ---
 
-## 8. Cross-Validation
+## 5. Test Prediction & Submission
 
-* **5-Fold Stratified Cross-Validation**
-* Evaluation metric: **ROC-AUC**
-* Ensures balanced class distribution across folds
-
-**Mean CV AUC ≈ 0.98**
-
----
-
-## 9. Model Saving
-
-The trained components were saved using `joblib`:
-
-* `trained_model.pkl` – Trained Logistic Regression model
-* `scaler.pkl` – Trained StandardScaler
-
-These ensure consistent preprocessing during inference.
-
----
-
-## 10. Test Dataset Prediction
-
-* Applied the same preprocessing pipeline
+* Applied the same preprocessing steps to test data
 * Generated **probability predictions** using `predict_proba`
-* Created Kaggle-compatible submission file with:
-
-```
-Packet_ID,Intrusion_Detected
-```
+* Created Kaggle-compatible submission file
 
 ---
 
-## 11. Tools & Libraries Used
+## 6. Conclusion
 
-* Python
-* Pandas
-* NumPy
-* Scikit-learn
-* Matplotlib
-* Joblib
-
----
-
-## 12. Conclusion
-
-The Logistic Regression model achieved a **high AUC score**, indicating strong intrusion detection capability.
-The pipeline is simple, reproducible, and suitable for real-world network security applications.
+The Logistic Regression model achieved a **high AUC**, demonstrating effective intrusion detection.
+The pipeline is simple, efficient, and suitable for real-world network security tasks.
